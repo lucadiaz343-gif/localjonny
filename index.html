@@ -223,20 +223,15 @@
     .scroll-hint {
   position: absolute;
   bottom: 2.5rem;
-  left: 0;
-  right: 0;
-  margin: 0 auto;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: .5rem;
   opacity: 0;
   animation: fadeUp 1s 1.1s ease forwards;
   z-index: 2;
-  width: 60px;
-  left: 50%;
-  transform: translateX(-50%);
 }
 .scroll-hint span { font-size: .58rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
 .scroll-line { width: 1px; height: 38px; background: rgba(255,255,255,0.4); animation: scPulse 2s 1.5s ease-in-out infinite; }
@@ -953,85 +948,65 @@
   // Carrusel infinito
   const track = document.getElementById('strip-track');
   if (track) {
-    // Duplicar items para loop infinito
-    const items = track.innerHTML;
-    track.innerHTML = items + items;
+    const original = track.innerHTML;
+    track.innerHTML = original + original;
 
-    let isDragging = false;
+    let pos = 0;
+    let dragging = false;
     let startX = 0;
-    let scrollLeft = 0;
-    let velocity = 0;
-    let lastX = 0;
-    let animFrame;
-    let autoScroll = true;
-    const speed = 1.2;
+    let startPos = 0;
+    let paused = false;
+    const half = () => track.scrollWidth / 2;
 
-    // Auto scroll
-    function autoPlay() {
-      if (autoScroll) {
-        track.scrollLeft += speed;
-        // Reset para loop infinito
-        if (track.scrollLeft >= track.scrollWidth / 2) {
-          track.scrollLeft = 0;
-        }
+    track.style.display = 'flex';
+    track.style.overflowX = 'hidden';
+
+    function tick() {
+      if (!dragging && !paused) {
+        pos += 1.5;
+        if (pos >= half()) pos = 0;
+        track.style.transform = `translateX(-${pos}px)`;
       }
-      animFrame = requestAnimationFrame(autoPlay);
+      requestAnimationFrame(tick);
     }
-    // Convertir strip-track a overflow scroll
-    track.style.overflowX = 'scroll';
-    track.style.overflowY = 'hidden';
-    track.style.scrollbarWidth = 'none';
-    track.style.msOverflowStyle = 'none';
-    track.parentElement.style.overflow = 'hidden';
-    animFrame = requestAnimationFrame(autoPlay);
+    requestAnimationFrame(tick);
 
-    // Drag para escritorio
+    // Mouse drag
     track.addEventListener('mousedown', e => {
-      isDragging = true;
-      autoScroll = false;
-      startX = e.pageX - track.offsetLeft;
-      scrollLeft = track.scrollLeft;
-      lastX = e.pageX;
-      track.style.transition = 'none';
+      dragging = true;
+      startX = e.clientX;
+      startPos = pos;
+      track.style.cursor = 'grabbing';
     });
-    track.addEventListener('mousemove', e => {
-      if (!isDragging) return;
-      e.preventDefault();
-      const x = e.pageX - track.offsetLeft;
-      velocity = e.pageX - lastX;
-      lastX = e.pageX;
-      track.scrollLeft = scrollLeft - (x - startX);
-      if (track.scrollLeft >= track.scrollWidth / 2) track.scrollLeft = 0;
-      if (track.scrollLeft <= 0) track.scrollLeft = track.scrollWidth / 2;
+    window.addEventListener('mousemove', e => {
+      if (!dragging) return;
+      const diff = startX - e.clientX;
+      pos = startPos + diff;
+      if (pos >= half()) pos = 0;
+      if (pos < 0) pos = half() - 1;
+      track.style.transform = `translateX(-${pos}px)`;
     });
-    track.addEventListener('mouseup', () => {
-      isDragging = false;
-      setTimeout(() => autoScroll = true, 2000);
-    });
-    track.addEventListener('mouseleave', () => {
-      if (isDragging) {
-        isDragging = false;
-        setTimeout(() => autoScroll = true, 2000);
-      }
+    window.addEventListener('mouseup', () => {
+      dragging = false;
+      track.style.cursor = 'grab';
+      setTimeout(() => paused = false, 1500);
     });
 
-    // Touch para mobile
+    // Touch drag
     track.addEventListener('touchstart', e => {
-      autoScroll = false;
-      startX = e.touches[0].pageX;
-      scrollLeft = track.scrollLeft;
-      lastX = e.touches[0].pageX;
+      startX = e.touches[0].clientX;
+      startPos = pos;
+      paused = true;
     }, { passive: true });
     track.addEventListener('touchmove', e => {
-      const x = e.touches[0].pageX;
-      velocity = x - lastX;
-      lastX = x;
-      track.scrollLeft = scrollLeft - (x - startX);
-      if (track.scrollLeft >= track.scrollWidth / 2) track.scrollLeft = 0;
-      if (track.scrollLeft <= 0) track.scrollLeft = track.scrollWidth / 2;
+      const diff = startX - e.touches[0].clientX;
+      pos = startPos + diff;
+      if (pos >= half()) pos = 0;
+      if (pos < 0) pos = half() - 1;
+      track.style.transform = `translateX(-${pos}px)`;
     }, { passive: true });
     track.addEventListener('touchend', () => {
-      setTimeout(() => autoScroll = true, 2000);
+      setTimeout(() => paused = false, 1500);
     });
   }
 
