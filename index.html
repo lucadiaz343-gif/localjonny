@@ -223,45 +223,70 @@
     .scroll-hint {
   position: absolute;
   bottom: 2.5rem;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: .5rem;
   opacity: 0;
   animation: fadeUp 1s 1.1s ease forwards;
   z-index: 2;
-  text-align: center;
   width: 60px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 .scroll-hint span { font-size: .58rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: rgba(255,255,255,0.5); }
 .scroll-line { width: 1px; height: 38px; background: rgba(255,255,255,0.4); animation: scPulse 2s 1.5s ease-in-out infinite; }
 @keyframes scPulse { 0%,100%{transform:scaleY(1);opacity:.3;} 50%{transform:scaleY(.35);opacity:1;} }
 
     /* ── PHOTO STRIP ── */
-    #photo-strip { padding: 0; }
-    .strip-grid {
-      display: grid;
-      grid-template-columns: 1.7fr 1fr 1fr 1fr;
-      gap: .5rem; height: 440px;
-    }
-    .strip-cell { overflow: hidden; position: relative; background: #eee; }
-    .strip-cell img { transition: transform .8s cubic-bezier(.23,1,.32,1); }
-    .strip-cell:hover img { transform: scale(1.07); }
-    .strip-cell video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-    .strip-label {
-      position: absolute; bottom: 1rem; left: 1rem;
-      font-size: .58rem; font-weight: 700; letter-spacing: .14em;
-      text-transform: uppercase; color: #fff;
-      background: rgba(17,17,17,.5); padding: .3rem .75rem;
-      border-radius: 999px; backdrop-filter: blur(6px);
-    }
+#photo-strip {
+  overflow: hidden;
+  position: relative;
+  cursor: grab;
+  user-select: none;
+}
+#photo-strip:active { cursor: grabbing; }
+.strip-track {
+  display: flex;
+  gap: .5rem;
+  height: 440px;
+  width: max-content;
+  transition: transform 0s;
+}
+.strip-cell {
+  overflow: hidden;
+  position: relative;
+  background: #eee;
+  flex-shrink: 0;
+  width: 420px;
+}
+.strip-cell img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .8s cubic-bezier(.23,1,.32,1);
+  pointer-events: none;
+}
+.strip-cell:hover img { transform: scale(1.07); }
+.strip-label {
+  position: absolute; bottom: 1rem; left: 1rem;
+  font-size: .58rem; font-weight: 700; letter-spacing: .14em;
+  text-transform: uppercase; color: #fff;
+  background: rgba(17,17,17,.5); padding: .3rem .75rem;
+  border-radius: 999px; backdrop-filter: blur(6px);
+}
+@media(max-width:960px){
+  .strip-track { height: 260px; }
+  .strip-cell { width: 75vw; }
+}
+@media(max-width:480px){
+  .strip-track { height: 220px; }
+  .strip-cell { width: 85vw; }
+}
 
     /* ── TICKER ── */
     .ticker-wrap { overflow: hidden; background: #3C6CA8; padding: 1rem 0; }
@@ -517,20 +542,6 @@
   .nav-logo-img { height: 36px; }
   #hero { padding: 0 1.5rem; }
   .hero-headline { font-size: clamp(3.5rem, 15vw, 6rem); }
-  #photo-strip { padding: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .strip-grid {
-    display: flex;
-    flex-direction: row;
-    height: 240px;
-    gap: .4rem;
-    width: max-content;
-    padding: 0 1rem;
-  }
-  .strip-cell {
-    width: 72vw;
-    flex-shrink: 0;
-    display: block !important;
-  }
   #infobar { grid-template-columns: 1fr; }
   .info-cell { border-right: none; border-bottom: 1px solid rgba(17,17,17,.07); padding: 1.5rem; }
   #about, #matcha, #visit { grid-template-columns: 1fr; }
@@ -549,7 +560,6 @@
 
 @media(max-width:480px){
   .hero-headline { font-size: clamp(3rem, 18vw, 5rem); }
-  .strip-grid { height: 180px; grid-template-columns: 1fr 1fr; }
   .gifts-grid { grid-template-columns: 1fr; }
   .bento-grid { grid-template-columns: 1fr; auto-rows: 200px; }
   .bento-cell.span-2 { grid-column: span 1; }
@@ -607,27 +617,40 @@
 </section>
 
 <div id="photo-strip">
-  <div class="strip-grid">
+  <div class="strip-track" id="strip-track">
     <div class="strip-cell">
-      <img src="fotos/DSC06478.jpg" alt="Coffee" />
+      <img src="fotos/DSC06478.jpg" alt="Coffee" loading="lazy"/>
       <span class="strip-label">Monomyth Coffee</span>
     </div>
     <div class="strip-cell">
-      <img src="fotos/DSC06365.jpg" alt="Local Jonny's" />
+      <img src="fotos/DSC06365.jpg" alt="Local Jonny's" loading="lazy"/>
       <span class="strip-label">Local Jonny's</span>
     </div>
     <div class="strip-cell">
-      <img src="fotos/DSC06773.jpg" alt="Tacos" />
+      <img src="fotos/DSC06773.jpg" alt="Tacos" loading="lazy"/>
       <span class="strip-label">Breakfast Tacos</span>
     </div>
     <div class="strip-cell">
-      <video autoplay muted loop playsinline style="width:100%;height:100%;object-fit:cover;display:block;">
-        <source src="videos/establecimiento-exterior.mp4" type="video/mp4" />
-      </video>
+      <img src="fotos/DSC06494.jpg" alt="Matcha" loading="lazy"/>
+      <span class="strip-label">Matcha Bar</span>
+    </div>
+    <div class="strip-cell">
+      <img src="fotos/DSC06341.jpg" alt="Interior" loading="lazy"/>
       <span class="strip-label">The Space</span>
     </div>
+    <div class="strip-cell">
+      <img src="fotos/DSC06647.jpg" alt="Drinks" loading="lazy"/>
+      <span class="strip-label">Good Coffee</span>
+    </div>
+    <div class="strip-cell">
+      <img src="fotos/DSC06526.jpg" alt="Matcha 2" loading="lazy"/>
+      <span class="strip-label">Ceremonial Matcha</span>
+    </div>
+    <div class="strip-cell">
+      <img src="fotos/DSC06374.jpg" alt="Exterior" loading="lazy"/>
+      <span class="strip-label">North Dallas</span>
+    </div>
   </div>
-
 </div>
 
 <div class="ticker-wrap">
@@ -919,10 +942,98 @@
   setInterval(() => {
     words[current].classList.remove('active');
     words[current].classList.add('exit');
-    setTimeout(() => words[current === 0 ? words.length - 1 : current - 1].classList.remove('exit'), 500);
+    setTimeout(() => {
+      const prev = current === 0 ? words.length - 1 : current - 1;
+      words[prev].classList.remove('exit');
+    }, 500);
     current = (current + 1) % words.length;
     words[current].classList.add('active');
   }, 2200);
+
+  // Carrusel infinito
+  const track = document.getElementById('strip-track');
+  if (track) {
+    // Duplicar items para loop infinito
+    const items = track.innerHTML;
+    track.innerHTML = items + items;
+
+    let isDragging = false;
+    let startX = 0;
+    let scrollLeft = 0;
+    let velocity = 0;
+    let lastX = 0;
+    let animFrame;
+    let autoScroll = true;
+    const speed = 1.2;
+
+    // Auto scroll
+    function autoPlay() {
+      if (autoScroll) {
+        track.scrollLeft += speed;
+        // Reset para loop infinito
+        if (track.scrollLeft >= track.scrollWidth / 2) {
+          track.scrollLeft = 0;
+        }
+      }
+      animFrame = requestAnimationFrame(autoPlay);
+    }
+    // Convertir strip-track a overflow scroll
+    track.style.overflowX = 'scroll';
+    track.style.overflowY = 'hidden';
+    track.style.scrollbarWidth = 'none';
+    track.style.msOverflowStyle = 'none';
+    track.parentElement.style.overflow = 'hidden';
+    animFrame = requestAnimationFrame(autoPlay);
+
+    // Drag para escritorio
+    track.addEventListener('mousedown', e => {
+      isDragging = true;
+      autoScroll = false;
+      startX = e.pageX - track.offsetLeft;
+      scrollLeft = track.scrollLeft;
+      lastX = e.pageX;
+      track.style.transition = 'none';
+    });
+    track.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      e.preventDefault();
+      const x = e.pageX - track.offsetLeft;
+      velocity = e.pageX - lastX;
+      lastX = e.pageX;
+      track.scrollLeft = scrollLeft - (x - startX);
+      if (track.scrollLeft >= track.scrollWidth / 2) track.scrollLeft = 0;
+      if (track.scrollLeft <= 0) track.scrollLeft = track.scrollWidth / 2;
+    });
+    track.addEventListener('mouseup', () => {
+      isDragging = false;
+      setTimeout(() => autoScroll = true, 2000);
+    });
+    track.addEventListener('mouseleave', () => {
+      if (isDragging) {
+        isDragging = false;
+        setTimeout(() => autoScroll = true, 2000);
+      }
+    });
+
+    // Touch para mobile
+    track.addEventListener('touchstart', e => {
+      autoScroll = false;
+      startX = e.touches[0].pageX;
+      scrollLeft = track.scrollLeft;
+      lastX = e.touches[0].pageX;
+    }, { passive: true });
+    track.addEventListener('touchmove', e => {
+      const x = e.touches[0].pageX;
+      velocity = x - lastX;
+      lastX = x;
+      track.scrollLeft = scrollLeft - (x - startX);
+      if (track.scrollLeft >= track.scrollWidth / 2) track.scrollLeft = 0;
+      if (track.scrollLeft <= 0) track.scrollLeft = track.scrollWidth / 2;
+    }, { passive: true });
+    track.addEventListener('touchend', () => {
+      setTimeout(() => autoScroll = true, 2000);
+    });
+  }
 
   function openModal(src) {
     document.getElementById('modal-img').src = src;
