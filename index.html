@@ -560,9 +560,17 @@
   .bento-cell.span-2 { grid-column: span 1; }
   .menu-grid { grid-template-columns: 1fr; }
 }
+  #coffee-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 50;
+  pointer-events: none;
+}
   </style>
 </head>
 <body>
+<canvas id="coffee-canvas"></canvas>
 
 <nav id="nav">
   <a class="nav-logo" href="#">
@@ -914,10 +922,132 @@
   </div>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-  // Nav sticky
-  const nav = document.getElementById('nav');
-  window.addEventListener('scroll', () => nav.classList.toggle('solid', scrollY > 80));
+// ── COFFEE BEANS 3D ──────────────────────────────
+const canvas = document.getElementById('coffee-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+camera.position.z = 8;
+
+// Lighting
+const ambient = new THREE.AmbientLight(0xffffff, 0.6);
+scene.add(ambient);
+const dirLight = new THREE.DirectionalLight(0xffd4a0, 1.2);
+dirLight.position.set(5, 5, 5);
+scene.add(dirLight);
+const dirLight2 = new THREE.DirectionalLight(0x3C6CA8, 0.4);
+dirLight2.position.set(-5, -3, 2);
+scene.add(dirLight2);
+
+// Coffee bean shape
+function createCoffeeBean() {
+  const group = new THREE.Group();
+  const bodyGeo = new THREE.SphereGeometry(0.5, 16, 12);
+  bodyGeo.scale(1, 0.65, 0.45);
+  const mat = new THREE.MeshStandardMaterial({
+    color: 0x3B1F0A,
+    roughness: 0.6,
+    metalness: 0.1,
+  });
+  const body = new THREE.Mesh(bodyGeo, mat);
+  group.add(body);
+  const creaseCurve = new THREE.QuadraticBezierCurve3(
+    new THREE.Vector3(-0.45, 0, 0.22),
+    new THREE.Vector3(0, 0.08, 0.24),
+    new THREE.Vector3(0.45, 0, 0.22)
+  );
+  const creasePoints = creaseCurve.getPoints(20);
+  const creaseGeo = new THREE.BufferGeometry().setFromPoints(creasePoints);
+  const creaseMat = new THREE.LineBasicMaterial({ color: 0x1a0a02, linewidth: 2 });
+  const crease = new THREE.Line(creaseGeo, creaseMat);
+  group.add(crease);
+  const crease2 = crease.clone();
+  crease2.rotation.y = Math.PI;
+  group.add(crease2);
+  return group;
+}
+
+const beans = [];
+const beanCount = window.innerWidth < 768 ? 10 : 18;
+for (let i = 0; i < beanCount; i++) {
+  const bean = createCoffeeBean();
+  bean.position.set(
+    (Math.random() - 0.5) * 20,
+    (Math.random() - 0.5) * 16,
+    (Math.random() - 0.5) * 4 - 1
+  );
+  bean.rotation.set(
+    Math.random() * Math.PI * 2,
+    Math.random() * Math.PI * 2,
+    Math.random() * Math.PI * 2
+  );
+  const scale = 0.3 + Math.random() * 0.5;
+  bean.scale.setScalar(scale);
+  bean.userData = {
+    rotSpeed: {
+      x: (Math.random() - 0.5) * 0.008,
+      y: (Math.random() - 0.5) * 0.012,
+      z: (Math.random() - 0.5) * 0.006,
+    },
+    floatSpeed: 0.3 + Math.random() * 0.5,
+    floatAmp: 0.08 + Math.random() * 0.12,
+    floatOffset: Math.random() * Math.PI * 2,
+    originY: bean.position.y,
+    originX: bean.position.x,
+    scrollFactor: (Math.random() - 0.5) * 0.006,
+    parallaxFactor: (Math.random() - 0.5) * 0.0015,
+  };
+  scene.add(bean);
+  beans.push(bean);
+}
+
+let scrollY = 0;
+let mouseX = 0;
+let mouseY = 0;
+let targetMouseX = 0;
+let targetMouseY = 0;
+
+window.addEventListener('scroll', () => { scrollY = window.scrollY; });
+window.addEventListener('mousemove', e => {
+  targetMouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+  targetMouseY = -(e.clientY / window.innerHeight - 0.5) * 2;
+});
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+const clock = new THREE.Clock();
+function animate() {
+  requestAnimationFrame(animate);
+  const t = clock.getElapsedTime();
+  mouseX += (targetMouseX - mouseX) * 0.04;
+  mouseY += (targetMouseY - mouseY) * 0.04;
+  beans.forEach(bean => {
+    const ud = bean.userData;
+    bean.rotation.x += ud.rotSpeed.x;
+    bean.rotation.y += ud.rotSpeed.y;
+    bean.rotation.z += ud.rotSpeed.z;
+    bean.position.y = ud.originY + Math.sin(t * ud.floatSpeed + ud.floatOffset) * ud.floatAmp;
+    bean.position.y -= scrollY * ud.scrollFactor;
+    bean.position.x = ud.originX + mouseX * (ud.parallaxFactor * 800);
+  });
+  camera.position.x = mouseX * 0.3;
+  camera.position.y = mouseY * 0.2;
+  camera.lookAt(scene.position);
+  renderer.render(scene, camera);
+}
+animate();
+
+// ── NAV STICKY ──
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => nav.classList.toggle('solid', window.scrollY > 80));
 
   // Scroll reveal
   const io = new IntersectionObserver(entries => {
@@ -1021,21 +1151,20 @@
   }
   document.addEventListener('keydown', e => { if(e.key === 'Escape') closeModal(); });
 
-  function toggleMenu() {
-    const burger = document.getElementById('nav-burger');
-    const links = document.getElementById('nav-links');
-    const overlay = document.getElementById('nav-overlay');
-    burger.classList.toggle('open');
-    links.classList.toggle('open');
-    overlay.classList.toggle('open');
-    document.body.style.overflow = links.classList.contains('open') ? 'hidden' : '';
-  }
-  function closeMenu() {
-    document.getElementById('nav-burger').classList.remove('open');
-    document.getElementById('nav-links').classList.remove('open');
-    document.getElementById('nav-overlay').classList.remove('open');
-    document.body.style.overflow = '';
-  }
+// ── NAV MENU ──
+function toggleMenu() {
+  document.getElementById('nav-burger').classList.toggle('open');
+  document.getElementById('nav-links').classList.toggle('open');
+  document.getElementById('nav-overlay').classList.toggle('open');
+  const isOpen = document.getElementById('nav-links').classList.contains('open');
+  document.body.style.overflow = isOpen ? 'hidden' : '';
+}
+function closeMenu() {
+  document.getElementById('nav-burger').classList.remove('open');
+  document.getElementById('nav-links').classList.remove('open');
+  document.getElementById('nav-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
 </script>
 </body>
 </html>
