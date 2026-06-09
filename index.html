@@ -10,7 +10,7 @@
   <meta name="keywords" content="coffee dallas, specialty coffee north dallas, breakfast tacos dallas, matcha dallas, local jonnys" />
   <meta property="og:title" content="Local Jonny's — Coffee Bar & General Store · Dallas, TX" />
   <meta property="og:description" content="Specialty coffee, breakfast tacos, craft beer and Texas-made gifts in North Dallas." />
-  <meta property="og:image" content="fotos/DSC06478.jpg" />
+  <meta property="og:image" content="fotos/DSC06478.webp" />
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -545,6 +545,7 @@
   .menu-grid { grid-template-columns: 1fr; }
 }
   </style>
+  <link rel="preload" as="video" href="video.mp4" />
 </head>
 <body>
 
@@ -569,7 +570,7 @@
 <div class="nav-overlay" id="nav-overlay" onclick="closeMenu()"></div>
 
 <section id="hero">
-  <video autoplay muted loop playsinline id="hero-video">
+  <video autoplay muted loop playsinline id="hero-video" preload="auto">
     <source src="video.mp4" type="video/mp4" />
   </video>
   <div class="hero-content">
@@ -594,35 +595,35 @@
 <div id="photo-strip">
   <div class="strip-track" id="strip-track">
     <div class="strip-cell">
-      <img src="fotos/DSC06478.jpg" alt="Coffee" loading="lazy"/>
+      <img src="fotos/DSC06478.webp" alt="Coffee" loading="lazy"/>
       <span class="strip-label">Monomyth Coffee</span>
     </div>
     <div class="strip-cell">
-      <img src="fotos/DSC06365.jpg" alt="Local Jonny's" loading="lazy"/>
+      <img src="fotos/DSC06365.webp" alt="Local Jonny's" loading="lazy"/>
       <span class="strip-label">Local Jonny's</span>
     </div>
     <div class="strip-cell">
-      <img src="fotos/DSC06773.jpg" alt="Tacos" loading="lazy"/>
+      <img src="fotos/DSC06773.webp" alt="Tacos" loading="lazy"/>
       <span class="strip-label">Breakfast Tacos</span>
     </div>
     <div class="strip-cell">
-      <img src="fotos/DSC06494.jpg" alt="Matcha" loading="lazy"/>
+      <img src="fotos/DSC06494.webp" alt="Matcha" loading="lazy"/>
       <span class="strip-label">Matcha Bar</span>
     </div>
     <div class="strip-cell">
-      <img src="fotos/DSC06341.jpg" alt="Interior" loading="lazy"/>
+      <img src="fotos/DSC06341.webp" alt="Interior" loading="lazy"/>
       <span class="strip-label">The Space</span>
     </div>
     <div class="strip-cell">
-      <img src="fotos/DSC06647.jpg" alt="Drinks" loading="lazy"/>
+      <img src="fotos/DSC06647.webp" alt="Drinks" loading="lazy"/>
       <span class="strip-label">Good Coffee</span>
     </div>
     <div class="strip-cell">
-      <img src="fotos/DSC06526.jpg" alt="Matcha 2" loading="lazy"/>
+      <img src="fotos/DSC06526.webp" alt="Matcha 2" loading="lazy"/>
       <span class="strip-label">Ceremonial Matcha</span>
     </div>
     <div class="strip-cell">
-      <img src="fotos/DSC06374.jpg" alt="Exterior" loading="lazy"/>
+      <img src="fotos/DSC06374.webp" alt="Exterior" loading="lazy"/>
       <span class="strip-label">North Dallas</span>
     </div>
   </div>
@@ -659,7 +660,7 @@
 
 <section id="about">
   <div class="about-photo">
-    <img src="fotos/DSC06369.jpg" alt="Local Jonny's exterior" />
+    <img src="fotos/DSC06369.webp" alt="Local Jonny's exterior" />
   </div>
   <div class="about-copy">
     <span class="s-tag reveal">The Story</span>
@@ -740,7 +741,7 @@
 
 <section id="matcha">
   <div class="matcha-photo">
-    <img src="fotos/DSC06494.jpg" alt="Matcha" style="object-position: center center;" />
+    <img src="fotos/DSC06494.webp" alt="Matcha" style="object-position: center center;" />
   </div>
   <div class="matcha-copy">
     <span class="s-tag reveal">The Ritual</span>
@@ -827,19 +828,19 @@
     <h2 class="s-title">A look<br><em>inside.</em></h2>
   </div>
   <div class="bento-grid">
-    <div class="bento-cell span-2" onclick="openModal('fotos/DSC06341.jpg')"><img src="fotos/DSC06341.jpg" loading="lazy"/><span class="strip-label">Inside the Store</span></div>
-    <div class="bento-cell" onclick="openModal('fotos/DSC06345.jpg')"><img src="fotos/DSC06345.jpg" loading="lazy"/><span class="strip-label">Local Vibes</span></div>
-    <div class="bento-cell" onclick="openModal('fotos/DSC06350.jpg')"><img src="fotos/DSC06350.jpg" loading="lazy"/><span class="strip-label">The Space</span></div>
-    <div class="bento-cell" onclick="openModal('fotos/DSC06374.jpg')"><img src="fotos/DSC06374.jpg" loading="lazy"/><span class="strip-label">Local Jonny's</span></div>
-    <div class="bento-cell span-2" onclick="openModal('fotos/DSC06478.jpg')"><img src="fotos/DSC06478.jpg" loading="lazy"/><span class="strip-label">Monomyth Coffee</span></div>
-    <div class="bento-cell" onclick="openModal('fotos/DSC06487.jpg')"><img src="fotos/DSC06487.jpg" loading="lazy"/><span class="strip-label">Fresh Daily</span></div>
-    <div class="bento-cell" onclick="openModal('fotos/DSC06494.jpg')"><img src="fotos/DSC06494.jpg" loading="lazy"/><span class="strip-label">Matcha Bar</span></div>
-    <div class="bento-cell span-2" onclick="openModal('fotos/DSC06526.jpg')"><img src="fotos/DSC06526.jpg" loading="lazy"/><span class="strip-label">Ceremonial Matcha</span></div>
-    <div class="bento-cell" onclick="openModal('fotos/DSC06647.jpg')"><img src="fotos/DSC06647.jpg" loading="lazy"/><span class="strip-label">Cold Brew</span></div>
-    <div class="bento-cell" onclick="openModal('fotos/DSC06656.jpg')"><img src="fotos/DSC06656.jpg" loading="lazy"/><span class="strip-label">Morning Ritual</span></div>
-    <div class="bento-cell span-2" onclick="openModal('fotos/DSC06773.jpg')"><img src="fotos/DSC06773.jpg" loading="lazy"/><span class="strip-label">Breakfast Tacos</span></div>
-    <div class="bento-cell" onclick="openModal('fotos/DSC06785.jpg')"><img src="fotos/DSC06785.jpg" loading="lazy"/><span class="strip-label">Taco of the Day</span></div>
-    <div class="bento-cell" onclick="openModal('fotos/DSC06865.jpg')"><img src="fotos/DSC06865.jpg" loading="lazy"/><span class="strip-label">Good Things</span></div>
+    <div class="bento-cell span-2" onclick="openModal('fotos/DSC06341.webp')"><img src="fotos/DSC06341.webp" loading="lazy"/><span class="strip-label">Inside the Store</span></div>
+    <div class="bento-cell" onclick="openModal('fotos/DSC06345.webp')"><img src="fotos/DSC06345.webp" loading="lazy"/><span class="strip-label">Local Vibes</span></div>
+    <div class="bento-cell" onclick="openModal('fotos/DSC06350.webp')"><img src="fotos/DSC06350.webp" loading="lazy"/><span class="strip-label">The Space</span></div>
+    <div class="bento-cell" onclick="openModal('fotos/DSC06374.webp')"><img src="fotos/DSC06374.webp" loading="lazy"/><span class="strip-label">Local Jonny's</span></div>
+    <div class="bento-cell span-2" onclick="openModal('fotos/DSC06478.webp')"><img src="fotos/DSC06478.webp" loading="lazy"/><span class="strip-label">Monomyth Coffee</span></div>
+    <div class="bento-cell" onclick="openModal('fotos/DSC06487.webp')"><img src="fotos/DSC06487.webp" loading="lazy"/><span class="strip-label">Fresh Daily</span></div>
+    <div class="bento-cell" onclick="openModal('fotos/DSC06494.webp')"><img src="fotos/DSC06494.webp" loading="lazy"/><span class="strip-label">Matcha Bar</span></div>
+    <div class="bento-cell span-2" onclick="openModal('fotos/DSC06526.webp')"><img src="fotos/DSC06526.webp" loading="lazy"/><span class="strip-label">Ceremonial Matcha</span></div>
+    <div class="bento-cell" onclick="openModal('fotos/DSC06647.webp')"><img src="fotos/DSC06647.webp" loading="lazy"/><span class="strip-label">Cold Brew</span></div>
+    <div class="bento-cell" onclick="openModal('fotos/DSC06656.webp')"><img src="fotos/DSC06656.webp" loading="lazy"/><span class="strip-label">Morning Ritual</span></div>
+    <div class="bento-cell span-2" onclick="openModal('fotos/DSC06773.webp')"><img src="fotos/DSC06773.webp" loading="lazy"/><span class="strip-label">Breakfast Tacos</span></div>
+    <div class="bento-cell" onclick="openModal('fotos/DSC06785.webp')"><img src="fotos/DSC06785.webp" loading="lazy"/><span class="strip-label">Taco of the Day</span></div>
+    <div class="bento-cell" onclick="openModal('fotos/DSC06865.webp')"><img src="fotos/DSC06865.webp" loading="lazy"/><span class="strip-label">Good Things</span></div>
   </div>
   <div id="gallery-modal" onclick="closeModal()">
     <div class="modal-inner">
