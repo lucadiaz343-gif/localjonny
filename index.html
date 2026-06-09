@@ -932,36 +932,40 @@ window.addEventListener('scroll', () => nav.classList.toggle('solid', window.scr
     const original = track.innerHTML;
     track.innerHTML = original + original + original;
 
+    track.style.display = 'flex';
+    track.style.willChange = 'transform';
+    track.style.backfaceVisibility = 'hidden';
+    track.style.webkitBackfaceVisibility = 'hidden';
+
     let pos = 0;
     let dragging = false;
     let startX = 0;
     let startPos = 0;
     let paused = false;
-    let dragVelocity = 0;
-    let lastDragX = 0;
-    const speed = 2.5;
+    let momentum = 0;
+    let lastX = 0;
+    let lastTime = 0;
+    const AUTO_SPEED = 1.8;
 
-    track.style.display = 'flex';
-    track.style.overflowX = 'hidden';
-    track.style.willChange = 'transform';
+    const getLimit = () => track.scrollWidth / 3;
 
-    const getHalf = () => track.scrollWidth / 3;
-
-    function tickCarousel() {
-      if (!dragging && !paused) {
-        pos += speed;
-        if (pos >= getHalf()) pos = 0;
+    let raf;
+    function loop() {
+      if (!dragging) {
+        if (!paused) pos += AUTO_SPEED;
+        if (Math.abs(momentum) > 0.5) {
+          pos += momentum;
+          momentum *= 0.95;
+        } else {
+          momentum = 0;
+        }
       }
-      if (!dragging && Math.abs(dragVelocity) > 0.1) {
-        pos += dragVelocity;
-        dragVelocity *= 0.92;
-        if (pos >= getHalf()) pos = 0;
-        if (pos < 0) pos = getHalf() - 1;
-      }
-      track.style.transform = `translateX(-${pos}px)`;
-      requestAnimationFrame(tickCarousel);
+      if (pos >= getLimit()) pos -= getLimit();
+      if (pos < 0) pos += getLimit();
+      track.style.transform = `translate3d(-${pos}px, 0, 0)`;
+      raf = requestAnimationFrame(loop);
     }
-    requestAnimationFrame(tickCarousel);
+    raf = requestAnimationFrame(loop);
 
     // Mouse
     track.addEventListener('mousedown', e => {
@@ -969,45 +973,50 @@ window.addEventListener('scroll', () => nav.classList.toggle('solid', window.scr
       paused = true;
       startX = e.clientX;
       startPos = pos;
-      lastDragX = e.clientX;
-      dragVelocity = 0;
-      track.style.cursor = 'grabbing';
+      lastX = e.clientX;
+      lastTime = Date.now();
+      momentum = 0;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(loop);
     });
     window.addEventListener('mousemove', e => {
       if (!dragging) return;
-      dragVelocity = lastDragX - e.clientX;
-      lastDragX = e.clientX;
+      const now = Date.now();
+      const dt = now - lastTime || 1;
+      momentum = (lastX - e.clientX) / dt * 16;
+      lastX = e.clientX;
+      lastTime = now;
       pos = startPos + (startX - e.clientX);
-      if (pos >= getHalf()) pos = 0;
-      if (pos < 0) pos = getHalf() - 1;
+      if (pos >= getLimit()) pos -= getLimit();
+      if (pos < 0) pos += getLimit();
     });
     window.addEventListener('mouseup', () => {
       if (!dragging) return;
       dragging = false;
-      track.style.cursor = 'grab';
-      setTimeout(() => { paused = false; dragVelocity = 0; }, 2500);
+      setTimeout(() => { paused = false; momentum = 0; }, 2000);
     });
 
     // Touch
-    let touchStartTime = 0;
     track.addEventListener('touchstart', e => {
+      paused = true;
       startX = e.touches[0].clientX;
       startPos = pos;
-      lastDragX = e.touches[0].clientX;
-      dragVelocity = 0;
-      paused = true;
-      touchStartTime = Date.now();
+      lastX = e.touches[0].clientX;
+      lastTime = Date.now();
+      momentum = 0;
     }, { passive: true });
     track.addEventListener('touchmove', e => {
-      dragVelocity = (lastDragX - e.touches[0].clientX) * 0.6;
-      lastDragX = e.touches[0].clientX;
-      pos = startPos + (startX - e.touches[0].clientX) * 0.8;
-      if (pos >= getHalf()) pos = 0;
-      if (pos < 0) pos = getHalf() - 1;
-      track.style.transform = `translateX(-${pos}px)`;
+      const now = Date.now();
+      const dt = now - lastTime || 1;
+      momentum = (lastX - e.touches[0].clientX) / dt * 14;
+      lastX = e.touches[0].clientX;
+      lastTime = now;
+      pos = startPos + (startX - e.touches[0].clientX);
+      if (pos >= getLimit()) pos -= getLimit();
+      if (pos < 0) pos += getLimit();
     }, { passive: true });
     track.addEventListener('touchend', () => {
-      setTimeout(() => { paused = false; }, 2000);
+      setTimeout(() => { paused = false; momentum = 0; }, 2000);
     });
   }
 
