@@ -929,64 +929,84 @@ window.addEventListener('scroll', () => nav.classList.toggle('solid', window.scr
   const track = document.getElementById('strip-track');
   if (track) {
     const original = track.innerHTML;
-    track.innerHTML = original + original;
+    track.innerHTML = original + original + original;
 
     let pos = 0;
     let dragging = false;
     let startX = 0;
     let startPos = 0;
     let paused = false;
-    const half = () => track.scrollWidth / 2;
+    let dragVelocity = 0;
+    let lastDragX = 0;
+    const speed = 2.5;
 
     track.style.display = 'flex';
     track.style.overflowX = 'hidden';
+    track.style.willChange = 'transform';
 
-    function tick() {
+    const getHalf = () => track.scrollWidth / 3;
+
+    function tickCarousel() {
       if (!dragging && !paused) {
-        pos += 1.5;
-        if (pos >= half()) pos = 0;
-        track.style.transform = `translateX(-${pos}px)`;
+        pos += speed;
+        if (pos >= getHalf()) pos = 0;
       }
-      requestAnimationFrame(tick);
+      if (!dragging && Math.abs(dragVelocity) > 0.1) {
+        pos += dragVelocity;
+        dragVelocity *= 0.92;
+        if (pos >= getHalf()) pos = 0;
+        if (pos < 0) pos = getHalf() - 1;
+      }
+      track.style.transform = `translateX(-${pos}px)`;
+      requestAnimationFrame(tickCarousel);
     }
-    requestAnimationFrame(tick);
+    requestAnimationFrame(tickCarousel);
 
-    // Mouse drag
+    // Mouse
     track.addEventListener('mousedown', e => {
       dragging = true;
+      paused = true;
       startX = e.clientX;
       startPos = pos;
+      lastDragX = e.clientX;
+      dragVelocity = 0;
       track.style.cursor = 'grabbing';
     });
     window.addEventListener('mousemove', e => {
       if (!dragging) return;
-      const diff = startX - e.clientX;
-      pos = startPos + diff;
-      if (pos >= half()) pos = 0;
-      if (pos < 0) pos = half() - 1;
-      track.style.transform = `translateX(-${pos}px)`;
+      dragVelocity = lastDragX - e.clientX;
+      lastDragX = e.clientX;
+      pos = startPos + (startX - e.clientX);
+      if (pos >= getHalf()) pos = 0;
+      if (pos < 0) pos = getHalf() - 1;
     });
     window.addEventListener('mouseup', () => {
+      if (!dragging) return;
       dragging = false;
       track.style.cursor = 'grab';
-      setTimeout(() => paused = false, 1500);
+      setTimeout(() => { paused = false; dragVelocity = 0; }, 2500);
     });
 
-    // Touch drag
+    // Touch
+    let touchStartTime = 0;
     track.addEventListener('touchstart', e => {
       startX = e.touches[0].clientX;
       startPos = pos;
+      lastDragX = e.touches[0].clientX;
+      dragVelocity = 0;
       paused = true;
+      touchStartTime = Date.now();
     }, { passive: true });
     track.addEventListener('touchmove', e => {
-      const diff = startX - e.touches[0].clientX;
-      pos = startPos + diff;
-      if (pos >= half()) pos = 0;
-      if (pos < 0) pos = half() - 1;
+      dragVelocity = (lastDragX - e.touches[0].clientX) * 0.6;
+      lastDragX = e.touches[0].clientX;
+      pos = startPos + (startX - e.touches[0].clientX) * 0.8;
+      if (pos >= getHalf()) pos = 0;
+      if (pos < 0) pos = getHalf() - 1;
       track.style.transform = `translateX(-${pos}px)`;
     }, { passive: true });
     track.addEventListener('touchend', () => {
-      setTimeout(() => paused = false, 1500);
+      setTimeout(() => { paused = false; }, 2000);
     });
   }
 
